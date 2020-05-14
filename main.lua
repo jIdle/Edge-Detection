@@ -14,38 +14,46 @@ function average(gradX, gradY, rows, cols)
 	return resImg
 end
 
+-- New weightedSum function
 function weightedSum(cutout, kernel)
-	local lum = 0
-	for i = 1, 3 do
-		for j = 1, 3 do
-			lum = lum + cutout[i][j]*kernel[i][j]
+	local kRows, kCols = #kernel, #kernel[1]
+	local r, g, b, lum = 0, 0, 0, 0
+	
+	for i = 1, kRows do
+		for j = 1, kCols do
+			r = r + cutout[i][j].red * kernel[i][j]
+			g = g + cutout[i][j].green * kernel[i][j]
+			b = b + cutout[i][j].blue * kernel[i][j]
+			lum = lum + cutout[i][j].lum * kernel[i][j]
 		end
 	end
-	return lum
+	
+	local center = (#cutout-1)/2
+	return {red=r, green=g, blue=b, alpha=cutout[center][center].alpha, lum=lum}
 end
 
-function convolve(image, kernel, rows, cols)
-	local gradImg = {}
-	local crop = #kernel - 1
-	local kRadius = math.floor(kRadius/2.0)
+-- New convolve function
+function convolve(image, kernel)
+	local rows, cols = #image - 1, #image[1] - 1
+	local toCrop = #kernel - 1
+	local kRadius = toCrop/2
 	
-	for i = 1, rows-crop do
-		gradImg[i] = {}
-		for j = 1, cols-crop do
-		
+	local result = {}
+	
+	for i = 1, (rows - toCrop) do
+		result[i] = {}
+		for j = 1, (cols - toCrop) do
 			local cutout = {}
-			for r = 0, crop do
-				cutout[r+1] = {}
-				for c = 0, crop do
-					cutout[r+1][c+1] = image[i+r][j+c].lum
+			for h = 1, #kernel do
+				cutout[h] = {}
+				for k = 1, #kernel do
+					cutout[h][k] = image[i+(h-1)][j+(k-1)] -- Image offset is -1
 				end
 			end
-			
-			r, g, b, a, _ = unpack(image[i+kRadius][j+kRadius])
-			gradImg[i][j] = {red=r, green=g, blue=b, alpha=a, lum=weightedSum(cutout, kernel)}
+			result[i][j] = weightedSum(cutout, kernel)
 		end
 	end
-	return gradImg
+	return result
 end
 
 function generateGaussian(kernel, dim, radius)
@@ -76,12 +84,13 @@ function love.load()
 	rows = origImg:getHeight() - 1
 	cols = origImg:getWidth() - 1
 	
+	-- Initialize image matrix
 	arrImg = {}
 	for i = 1, rows do
 		arrImg[i] = {}
 		for j = 1, cols do
 			r, g, b, a = origImg:getPixel(j-1, i-1) -- LOVE2D uses (x,y) coords, not row-major order
-			if a  == 0 then
+			if a == 0 then
 				r = 0
 				g = 0
 				b = 0
