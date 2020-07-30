@@ -1,4 +1,4 @@
-# Edge-Detection
+# Sobel Edge Detection
 This program will convolve the specified image with the Sobel operator, resulting in an approximation of the image gradient.
 Edges (changes in pixel intensity) will be emphasized in the resulting image, allowing the user to more easily detect where lines and edges exist within the photo.
 
