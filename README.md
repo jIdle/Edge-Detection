@@ -6,7 +6,7 @@ Love2D is necessary for this program to work. While the standard Lua libraries a
 
 
 # Example
-### Initial Image
+## Initial Image
 ![Image of Rose before convolution](https://github.com/jIdle/Edge-Detection/blob/master/Rose.png)
-### Convolved Image
+## Convolved Image
 ![Image of Rose after convolution](https://github.com/jIdle/Edge-Detection/blob/master/ConvolvedRose.png)
