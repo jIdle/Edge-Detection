@@ -56,7 +56,7 @@ function convolve(image, kernel)
 	return result
 end
 
-function generateGaussian(kernel, dim, radius)
+function generateGaussian(kernel, radius)
 	stdev = 1.0
 	pi = 355.0/113.0
 	constant = 1.0/(2.0*pi*math.pow(stdev, 2))
@@ -75,7 +75,7 @@ function love.load()
 	kGaussian = {}
 	kDim = 3
 	kRadius = math.floor(kDim/2.0)
-	generateGaussian(kGaussian, kDim, kRadius)
+	generateGaussian(kGaussian, kRadius)
 
 	kX = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}}
 	kY = {{1, 2, 1}, {0, 0, 0}, {-1, -2, -1}}
@@ -100,12 +100,10 @@ function love.load()
 		end
 	end
 	
-	blurImg = convolve(arrImg, kGaussian, rows, cols)
-	rows = #blurImg - 1
-	cols = #blurImg[1] - 1
+	blurImg = convolve(arrImg, kGaussian)
 	
-	gradX = convolve(blurImg, kX, rows, cols)
-	gradY = convolve(blurImg, kY, rows, cols)
+	gradX = convolve(blurImg, kX)
+	gradY = convolve(blurImg, kY)
 	rows = #gradX - 1
 	cols = #gradX[1] - 1
 	
